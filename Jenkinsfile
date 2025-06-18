@@ -8,7 +8,7 @@ pipeline {
         deploy_To = "production"
         region = "us-east-1"
         appVersion = ''
-        environment = ''
+        deploy_env = ''
     }
     options {
         timeout(time: 30, unit: 'MINUTES')
@@ -24,8 +24,10 @@ pipeline {
         stage('setup Environment') {
             steps {
                 script {
-                    appVersion = params.version
-                    environment = params.deploy_to
+                    env.appVersion = params.version
+                    env.deploy_env = params.deploy_to
+                    echo "App Version: ${env.appVersion}, Deploying to: ${env.deploy_env}"
+
                 }
             }
         }
@@ -49,10 +51,10 @@ pipeline {
                 script{
                     withAWS(region: 'us-east-1', credentials: "aws-credentials") {
                         sh """
-                            aws eks update-kubeconfig --region $region --name expense-dev
+                            aws eks update-kubeconfig --region $region --name expense-${deploy_env}
                             kubectl get nodes
                             cd helm
-                            sed -i 's/IMAGE_VERSION/${param.version}/g' values-${environment}.yaml
+                            sed -i 's/IMAGE_VERSION/${params.appVersion}/g' values-${params.deploy_env}.yaml
                             cat values-${environment}.yaml
                         """
                     }
