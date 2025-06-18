@@ -2,82 +2,64 @@ pipeline {
     agent {
         label 'AGENT-1'
     }
+
     environment {
         project = "expense"
         component = "backend"
-        deploy_To = "production"
         region = "us-east-1"
-        appVersion = ''
-        deploy_env = ''
     }
+
     options {
         timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
-        // retry(1)
     }
+
     parameters {
-        string(name: 'version', description: 'enter the application version')
-        choice(name: 'deploy_to', choices: ['dev', 'qa','prod'], description: 'Pick something')
+        string(name: 'version', description: 'Enter the application version')
+        choice(name: 'deploy_to', choices: ['dev', 'qa', 'prod'], description: 'Pick the environment')
     }
-   
-    stages {    
-        stage('setup Environment') {
+
+    stages {
+        stage('Setup Environment') {
             steps {
                 script {
-                    env.appVersion = params.version
-                    env.deploy_env = params.deploy_to
-                    echo "App Version: ${env.appVersion}, Deploying to: ${env.deploy_env}"
-
+                    env.APP_VERSION = params.version
+                    env.DEPLOY_ENV = params.deploy_to
+                    echo "App Version: ${env.APP_VERSION}, Deploying to: ${env.DEPLOY_ENV}"
                 }
             }
         }
 
-            // steps {
-            //     script {
-            //         if (params.DEPLOY_TO == 'dev') {
-            //             environment = 'dev'
-            //         } else if (params.DEPLOY_TO == 'qa') {
-            //             environment = 'qa'
-            //         } else if (params.DEPLOY_TO == 'prod') {
-            //             environment = 'prod'
-            //         }
-            //         echo "Deploying to ${environment} environment"
-            //     }
-            // }
-        
         stage('Deploy') {
-
-            steps { 
-                script{
-                    withAWS(region: 'us-east-1', credentials: "aws-credentials") {
+            steps {
+                script {
+                    withAWS(region: "${env.region}", credentials: "aws-credentials") {
                         sh """
-                            aws eks update-kubeconfig --region $region --name expense-${deploy_env}
+                            aws eks update-kubeconfig --region ${env.region} --name expense-${env.DEPLOY_ENV}
                             kubectl get nodes
                             cd helm
-                            sed -i 's/IMAGE_VERSION/${params.appVersion}/g' values-${params.deploy_env}.yaml
-                            cat values-${environment}.yaml
+                            sed -i 's/IMAGE_VERSION/${env.APP_VERSION}/g' values-${env.DEPLOY_ENV}.yaml
+                            cat values-${env.DEPLOY_ENV}.yaml
                         """
                     }
-                }  
+                }
             }
         }
-    
-    }           
-        
+    }
 
     post {
         always {
-            echo 'This will always run'     
+            echo 'This will always run'
             deleteDir()
         }
         success {
-            echo 'This will run only if the pipeline is successful'
+            echo 'Pipeline completed successfully'
         }
         failure {
-            echo 'This will run only if the pipeline fails'
+            echo 'Pipeline failed'
         }
         unstable {
-            echo 'This will run only if the pipeline is unstable'
+            echo 'Pipeline is unstable'
         }
     }
 }
