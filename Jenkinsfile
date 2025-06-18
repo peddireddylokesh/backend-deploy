@@ -29,19 +29,20 @@ pipeline {
                 }
             }
         }
-            steps {
-                script {
-                    if (params.DEPLOY_TO == 'dev') {
-                        environment = 'dev'
-                    } else if (params.DEPLOY_TO == 'qa') {
-                        environment = 'qa'
-                    } else if (params.DEPLOY_TO == 'prod') {
-                        environment = 'prod'
-                    }
-                    echo "Deploying to ${environment} environment"
-                }
-            }
-        }
+
+            // steps {
+            //     script {
+            //         if (params.DEPLOY_TO == 'dev') {
+            //             environment = 'dev'
+            //         } else if (params.DEPLOY_TO == 'qa') {
+            //             environment = 'qa'
+            //         } else if (params.DEPLOY_TO == 'prod') {
+            //             environment = 'prod'
+            //         }
+            //         echo "Deploying to ${environment} environment"
+            //     }
+            // }
+        
         stage('Deploy') {
 
             steps { 
