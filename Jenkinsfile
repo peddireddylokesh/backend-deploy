@@ -7,8 +7,9 @@ pipeline {
         project = "expense"
         component = "backend"
         region = "us-east-1"
-        APP_VERSION =''
-        DEPLOY_ENV = ''
+        appVersion = ''
+        environment = ''
+        
     }
 
     options {
@@ -25,9 +26,9 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    env.APP_VERSION = params.version
-                    env.DEPLOY_ENV = params.deploy_to
-                    echo "App Version: ${env.APP_VERSION}, Deploying to: ${env.DEPLOY_ENV}"
+                    appVersion = params.version
+                    environment = params.deploy_to
+                    echo "App Version: ${params.version}, Deploying to: ${environment}"
                 }
             }
         }
@@ -37,11 +38,11 @@ pipeline {
                 script {
                     withAWS(region: "${env.region}", credentials: "aws-credentials") {
                         sh """
-                            aws eks update-kubeconfig --region ${env.region} --name expense-${env.DEPLOY_ENV}
+                            aws eks update-kubeconfig --region $region --name expense-dev
                             kubectl get nodes
                             cd helm
-                            sed -i 's/IMAGE_VERSION/${env.APP_VERSION}/g' values-${env.DEPLOY_ENV}.yaml
-                            cat values-${env.DEPLOY_ENV}.yaml
+                            sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
+                            cat values-${environment}.yaml
                         """
                     }
                 }
