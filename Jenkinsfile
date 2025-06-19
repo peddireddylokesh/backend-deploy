@@ -38,13 +38,15 @@ pipeline {
                 script {
                     withAWS(region: "${env.region}", credentials: "aws-credentials") {
                         sh """
-                            aws eks update-kubeconfig --region $region --name expense-dev
+                            aws eks update-kubeconfig --region ${env.region} --name ${env.project}-${env.ENVIRONMENT}
                             kubectl get nodes
                             cd helm
-                            sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
-                            helm upgrade --install ${project}-${component} -n $project -f values-${environment}.yaml .
-
+                            helm upgrade --install ${env.project}-${env.component} -n ${env.project} \
+                                -f values-${env.ENVIRONMENT}.yaml \
+                                --set deployment.imageURL=897729141306.dkr.ecr.${env.region}.amazonaws.com/${env.project}-${env.component}:${env.APP_VERSION} \
+                                .
                         """
+
                     }
                 }
             }
