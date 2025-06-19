@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: "{{ .Values.deployment.imageURL }}:{{ .Values.Deployment.imageVersion }}"
+          image: "{{ .Values.deployment.imageURL }}:{{ .Values.deployment.imageVersion }}"
           envFrom:
            - configMapRef:
               name: backend
