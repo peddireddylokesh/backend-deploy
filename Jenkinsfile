@@ -7,6 +7,7 @@ pipeline {
         project = "expense"
         component = "backend"
         region = "us-east-1"
+        DEPLOY_TO = "production"
         appVersion = ''
         environment = ''
         
@@ -28,7 +29,7 @@ pipeline {
                 script {
                     appVersion = params.version
                     environment = params.deploy_to
-                    echo "App Version: ${params.version}, Deploying to: ${environment}"
+                    
                 }
             }
         }
@@ -38,7 +39,7 @@ pipeline {
                 script {
                     withAWS(region: "${env.region}", credentials: "aws-credentials") {
                         sh """
-                            aws eks update-kubeconfig --region $region --name expense-${environment}
+                            aws eks update-kubeconfig --region $region --name expense-dev
                             kubectl get nodes
                             cd helm
                             sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
