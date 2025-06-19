@@ -7,6 +7,8 @@ pipeline {
         project = "expense"
         component = "backend"
         region = "us-east-1"
+        APP_VERSION =''
+        DEPLOY_ENV = ''
     }
 
     options {
