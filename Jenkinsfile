@@ -42,7 +42,8 @@ pipeline {
                             kubectl get nodes
                             cd helm
                             sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
-                            cat values-${environment}.yaml
+                            helm upgrade --install ${project}-${component} -n $project -f values-${environment}.yaml .
+
                         """
                     }
                 }
