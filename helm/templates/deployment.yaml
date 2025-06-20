@@ -10,7 +10,7 @@ metadata:
     tier:  backend
     project: expense
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -24,7 +24,7 @@ spec:
         project: expense
     spec:
       containers:
-        - name: backend
+        - name: nginx
           image: "{{ .Values.deployment.imageURL }}:{{ .Values.deployment.imageVersion }}"
           envFrom:
            - configMapRef:

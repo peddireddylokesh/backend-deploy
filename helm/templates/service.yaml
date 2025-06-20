@@ -6,7 +6,7 @@ metadata:                 # this is all internal to the cluster
 spec:
   selector:
     app: backend
-    tier: api
+    tier: backend
     project: expense
   ports:
   - protocol: TCP
