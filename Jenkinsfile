@@ -43,6 +43,7 @@ pipeline {
                             kubectl get nodes
                             cd helm
                             sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
+                            kubectl create namespace $project --dry-run=client -o yaml | kubectl apply -f -
                             helm upgrade --install $component -n $project -f values-${environment}.yaml .
 
                         """
