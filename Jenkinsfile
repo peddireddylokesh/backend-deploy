@@ -39,7 +39,7 @@ pipeline {
                 script {
                     withAWS(region: "${env.region}", credentials: "aws-credentials") {
                         sh """
-                            aws eks update-kubeconfig --region $region --name expense-dev
+                            aws eks update-kubeconfig --region $region --name expense-dev --alias expense-dev --use-public-endpoint
                             kubectl get nodes
                             cd helm
                             sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
